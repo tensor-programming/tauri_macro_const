@@ -77,6 +77,46 @@ impl ConstantWriter {
         )?)
     }
 
+    pub fn add_public_constant<T: Debug>(
+        &mut self,
+        name: &str,
+        typ: &str,
+        value: T,
+    ) -> CResult<()> {
+        self.add_public_constant_raw(name, typ, &format!("{:?}", value))?;
+        Ok(())
+    }
+
+    fn add_public_constant_raw(
+        &mut self,
+        name: &str,
+        typ: &str,
+        raw_const: &String,
+    ) -> CResult<()> {
+        Ok(writeln!(
+            self.file,
+            "pub const {}: {} = {};",
+            name.to_uppercase(),
+            typ,
+            raw_const
+        )?)
+    }
+
+    pub fn add_static_value<T: Debug>(&mut self, name: &str, typ: &str, value: T) -> CResult<()> {
+        self.add_static_value_raw(name, typ, &format!("{:?}", value))?;
+        Ok(())
+    }
+
+    fn add_static_value_raw(&mut self, name: &str, typ: &str, raw_const: &String) -> CResult<()> {
+        Ok(writeln!(
+            self.file,
+            "pub static {}: {} = {};",
+            name.to_uppercase(),
+            typ,
+            raw_const
+        )?)
+    }
+
     // close the file to finish writing the constant macros.
     pub fn close(&mut self) -> CResult<()> {
         Ok(self.file.flush()?)
