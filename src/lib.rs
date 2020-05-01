@@ -16,7 +16,7 @@ macro_rules! include_const_file {
     ($file_name: expr) => {
         include!(concat!(
             env!("OUT_DIR"),
-            concat("/", concat!($file_name, ".rs"))
+            concat!("/", concat!($file_name, ".rs"))
         ));
     };
 }
@@ -31,29 +31,29 @@ pub enum CError {
     FileError(#[from] io::Error),
 }
 
-pub struct ConstantMacroWriter {
+pub struct ConstantWriter {
     file: File,
 }
 
-impl ConstantMacroWriter {
+impl ConstantWriter {
     // create a new macro const writer with a name: {name}.rs
-    pub fn new(name: &str) -> CResult<ConstantMacroWriter> {
+    pub fn new(name: &str) -> CResult<ConstantWriter> {
         let out_dir = env::var("OUT_DIR")?;
         let name = format!("{}.rs", name);
         let dest = Path::new(&out_dir).join(name);
         let file = File::create(&dest)?;
 
-        Ok(ConstantMacroWriter { file })
+        Ok(ConstantWriter { file })
     }
 
     // create a new macro const writer from a given path.
-    pub fn new_from_path(path: &Path) -> CResult<ConstantMacroWriter> {
+    pub fn new_from_path(path: &Path) -> CResult<ConstantWriter> {
         let file = fs::OpenOptions::new()
             .write(true)
             .truncate(true)
             .open(path)?;
 
-        Ok(ConstantMacroWriter { file })
+        Ok(ConstantWriter { file })
     }
 
     // add an import to the macro const file.
@@ -61,13 +61,13 @@ impl ConstantMacroWriter {
         Ok(writeln!(self.file, "pub use {};", lib_name)?)
     }
 
-    // add the value you want to turn into a constant macro.
-    pub fn add_const<T: Debug>(&mut self, name: &str, value: T) -> CResult<()> {
-        Ok(self.add_const_raw(name, &format!("{:?}", value))?)
+    // add the value you want to turn into a constant macro. Must be a debug type to be registered as a string.
+    pub fn add_const_macro<T: Debug>(&mut self, name: &str, value: T) -> CResult<()> {
+        Ok(self.add_const_macro_raw(name, &format!("{:?}", value))?)
     }
 
     // inner functionality for building a constant macro.
-    pub fn add_const_raw(&mut self, name: &str, raw_const: &String) -> CResult<()> {
+    fn add_const_macro_raw(&mut self, name: &str, raw_const: &String) -> CResult<()> {
         writeln!(self.file, "#[macro_export]")?;
 
         Ok(writeln!(

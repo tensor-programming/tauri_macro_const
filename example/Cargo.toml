@@ -1,0 +1,13 @@
+[package]
+name = "example"
+version = "0.1.0"
+include = ["data", "data/*", "data/**"]
+build = "build.rs"
+publish = false
+edition = "2018"
+
+[dependencies]
+tauri_macro_const = {path = "../"}
+
+[build-dependencies]
+tauri_macro_const = {path = "../"}
