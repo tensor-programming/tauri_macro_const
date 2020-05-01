@@ -1,5 +1,5 @@
 [package]
-name = "tauri_macro_consts"
+name = "tauri_macro_const"
 version = "0.1.0"
 authors = ["tensor-programming <tensordeveloper@gmail.com>"]
 edition = "2018"
